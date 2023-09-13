@@ -2,7 +2,6 @@ package stardewvalley;
 
 import java.io.*;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class StardewValleyLogin {
    private String filename;
@@ -133,7 +132,7 @@ public class StardewValleyLogin {
 
         }
     }
-    public void login(String username) throws IOException,FileNotFoundException {
+    public void login(String username) throws Exception {
         boolean userExists=true;
         ObjectInputStream userArchive = new ObjectInputStream(new FileInputStream((String) username + ".txt"));
         try{
@@ -149,9 +148,8 @@ public class StardewValleyLogin {
         }finally {
 
             if(userExists){
-                UserGameData gameData=new UserGameData(username);
-                gameData.userGame();
-
+                UserGame userGame=new UserGame(username);
+                userGame.mainGame();
             }
             else{
                 throw new FileNotFoundException("User does not exist!");// no llega a ejecutarse puesto que el archivo no existe para Java y salta el error antes.
