@@ -28,9 +28,10 @@ public class StardewValleyLogin {
              if(usuario.equals(newContact)){
                  userExists=true;
              }
-
+        // lets just agree indentations here make no sense. This curly bracket below sits in a place as if its the one
+        // that closes try block, while in reality, its for while block. Use Ctrl + Alt + L
         }
-
+        // using exceptions as a way tp exit endless loop is a bad practice. There are dozens of ways to do it correctly
         }catch (Exception e){//when archive doesn't have the new user, starts to write the new user
 
             // Reopen the archive and reset position
@@ -42,12 +43,17 @@ public class StardewValleyLogin {
 
             try{
                 while (true){
+                    // idk what comprobador means, hence, cant tell what exactly you are doing here, therefore, cant
+                    // review it
                     String comprobador=(String)archive.readObject();
                     if (comprobador.equals(newContact)){
                         throw new IllegalArgumentException("User already exists");
                     };
 
                 }
+                // that is NOT how try-catch-finally supposed to be used
+                // please stick to boolean variables, expressions and if-else statements, it will be both more
+                // memory efficient, simpler and faster
             }catch (Exception n){
                 //User does not exist. Continue
             }finally {
@@ -62,22 +68,25 @@ public class StardewValleyLogin {
                     File fArchive=new File(this.filename);
                     File fArchiveCopy=new File("auxCopy.txt");
 
-
+                    // delete and rename operations here could fail for multiple non related to program reasons.
+                    // thats why both methods return boolean that tells if operation was successful
                     fArchive.delete();
                     fArchiveCopy.renameTo(fArchive);
                     System.out.println("Registered user");
                     String userStringTxt=newContact.toString()+".txt";
+                    // if you want to create new file, just use File#createNewFile()
                     ObjectOutputStream userFile= new ObjectOutputStream(new FileOutputStream(userStringTxt));
                     userFile.close();
 
                         System.out.println("Done!");
             }
-                else{
+                else {
                     throw new IllegalArgumentException("User already exists!");
                 }
             }
         }
    }
+   // please keep only exceptions that are actually thrown in throws list
     public void list() throws IOException,FileNotFoundException {
         ObjectOutputStream AuxCopy=new ObjectOutputStream(new FileOutputStream("auxCopy.txt"));
         ObjectInputStream archive=new ObjectInputStream(new FileInputStream(this.filename));
@@ -102,10 +111,11 @@ public class StardewValleyLogin {
 
         }
    }
+   // once again, this all could be simplified a lot by not using exceptions to exit the loop
     public void remove(String userToRemove) throws IOException, FileNotFoundException {
         ObjectOutputStream auxCopy = new ObjectOutputStream(new FileOutputStream("auxCopy.txt"));
         ObjectInputStream archive = new ObjectInputStream(new FileInputStream(this.filename));
-
+        // you can use try-with-resources here. Look that up
         try {
             while (true) {
                 String usuario = (String) archive.readObject();
@@ -146,7 +156,7 @@ public class StardewValleyLogin {
         }catch (Exception n){
             //User does exist. Continue
         }finally {
-
+            // btw, if you remove finally keyword here and curly brackets attached to it, you would get exactly the same result
             if(userExists){
                 UserGame userGame=new UserGame(username);
                 userGame.mainGame();

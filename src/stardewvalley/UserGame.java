@@ -10,6 +10,8 @@ public class UserGame {
     public static Calendar initialCalendarGame(){
         Calendar date= Calendar.getInstance();
         date.set(Calendar.YEAR,2010);
+        // oh, you seem to know that there are constants for every month in Calendar class
+        // Then why did you create a map of months in your thread??? You can just use Calendar
         date.set(Calendar.MONTH,Calendar.JANUARY);
         date.set(Calendar.DAY_OF_MONTH,1);
         date.set(Calendar.HOUR_OF_DAY,10);
@@ -73,6 +75,16 @@ public class UserGame {
         while (shopping) {
             System.out.println("Welcome to the shop! What would you like to do? Buy or Sell(B/S)");
             Scanner scanner = new Scanner(System.in);
+            // you can do following lines in two more efficient ways:
+            /*
+            1
+            char lecture = scanner.next().toLowerCase().charAt(0);
+            if (lecture == 'b') ...
+
+            2
+            char lecture = scanner.next().charAt(0);
+            if (Character.toLowerCase(lecture) == 'b') ...
+             */
             char lecture = scanner.next().charAt(0);
             if (lecture == 'B' || lecture == 'b') {
                 System.out.println("Selecting buying menu:\nNadia(animals)\nMark(crops)\nIrene(other)\nPress 1,2 or 3");
@@ -88,6 +100,7 @@ public class UserGame {
                 System.out.println("Invalid input.");
             }
             System.out.println("Do you want to continue shopping? Y/N");
+            // You dont need new scanner to continue, you already have one in this scope
             Scanner continueScanner = new Scanner(System.in);
             char continueChoice = continueScanner.next().charAt(0);
             if (continueChoice == 'N' || continueChoice == 'n') {
@@ -103,7 +116,11 @@ public class UserGame {
             Scanner scanner = new Scanner(System.in);
             char lecture = scanner.next().charAt(0);
             if (lecture == 'Y' || lecture == 'y') {
+                // this is strange code choice, you have a method that returns boolean, yet you ever only return true
+                // from it. Wouldnt it be more logical to return false when user wants to exit, and finish your program
+                // where it started instead of here?
                 System.exit(0);
+                // i believe this code is unreachable
                 throw new Exception("Process ended. Game closed");
             } else if (lecture == 'N' || lecture == 'n') {
                 quitting = false;
@@ -118,6 +135,8 @@ public class UserGame {
         return true;
     }
     public void switchThread(UpdateMenuThreadTask threadTask){
+        // When working with boolean, you can come up with really clever solutions. Could simplify this method to one line:
+        // threadTask.setActiveInScreen(!threadTask.isActiveInScreen());
         if(threadTask.isActiveInScreen()==false) {
             threadTask.setActiveInScreen(true);
         }
