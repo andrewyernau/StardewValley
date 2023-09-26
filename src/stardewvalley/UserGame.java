@@ -1,128 +1,234 @@
 package stardewvalley;
 
+import stardewvalley.entity.animal.Animal;
 import stardewvalley.thread.UpdateMenuThreadTask;
+import stardewvalley.user.inventory.Inventory;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserGame {
     public Calendar date;
-    public static Calendar initialCalendarGame(){
-        Calendar date= Calendar.getInstance();
-        date.set(Calendar.YEAR,2010);
-        date.set(Calendar.MONTH,Calendar.JANUARY);
-        date.set(Calendar.DAY_OF_MONTH,1);
-        date.set(Calendar.HOUR_OF_DAY,10);
-        date.set(Calendar.MINUTE,0);
+
+    public static Calendar initialCalendarGame() {
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.YEAR, 2010);
+        date.set(Calendar.MONTH, Calendar.JANUARY);
+        date.set(Calendar.DAY_OF_MONTH, 1);
+        date.set(Calendar.HOUR_OF_DAY, 10);
+        date.set(Calendar.MINUTE, 0);
         return date;
     }
+
     public String username;
     public float money;
-    public  UserGame(String username){
-        this.username=username;
-        this.money=money;
+
+    public UserGame(String username) {
+        this.username = username;
+        this.money = money;
     }
+
     public String getUsername() {
         return username;
     }
+
     public float getMoney() {
         return money;
     }
+
     public void setMoney(float moneyPay) {
-        this.money+=moneyPay;
+        this.money += moneyPay;
     }
 
-    public Calendar getDate() {
-        return date;
-    }
 
-    public void setDate(Calendar date) {
-        this.date = date;
-    }
     public void mainGame() throws Exception {
-        boolean reading=true;
-        UpdateMenuThreadTask threadTask=new UpdateMenuThreadTask();
+
+        //SETTING UP YOUR CHARACTER
+        Inventory userInventory = new Inventory();
+        List<Animal> farmLand = new ArrayList<>();
+
+
+        setMoney(2000);//Initial money
+        boolean reading = true;
+
+        //STARTING TIME RUN
+
+        UpdateMenuThreadTask threadTask = new UpdateMenuThreadTask();
         threadTask.startProcess();
         threadTask.start();
-        Scanner scanner=new Scanner(System.in);
-        while(reading){
-            char lecture=scanner.next().charAt(0);
-            switch (String.valueOf(lecture)){
-                case "t":
-                    System.out.println("t has been pressed");
+
+        //GAME STARTED
+
+        Scanner scanner = new Scanner(System.in);
+        while (reading) {
+            Calendar date = threadTask.getGamedate();//need to get calendar from ThreadTask for the up to date date.
+            char lecture = scanner.next().charAt(0);
+            switch (lecture) {
+                case 't'://show or hide time
                     switchThread(threadTask);
                     break;
-                case "q":
-                    reading=quit(threadTask);
-                    System.out.println("back to mainGame");
-                    System.out.println("valor de reading "+reading);
+                case 'q'://quit game
+                    reading = quit(threadTask);
+                    System.out.println("\rback to mainGame");
                     break;
-                case "o":
-                    System.out.println("Options are: t for toggle time display, q for quit the game,b for open the merch");
+                case 'o'://options
+                    System.out.println("\rOptions are: t for toggle time display, q for quit the game,b for open the merch");
                     break;
-                case "b":
-                    shop(money);
+                case 's'://shop
+                    shop(money, date, threadTask, (List) userInventory);
+                    break;
+                case 'm':
+                    System.out.println("Your money" + money);
                     break;
             }
-            System.out.println("thread state "+threadTask.isRunning());
         }
-        System.out.println("value of reading your input "+reading+ ", we are not suposed to be there. this is a non contemplated place");
+        System.out.println("value of reading your input " + reading + ", therefore we are not suposed to be there, this is a non contemplated place");
     }
-    public void shop(float money) {
+
+    public void shop(float money, Calendar date, UpdateMenuThreadTask threadTask, List inventory) {
+        if (threadTask.isActiveInScreen()) switchThread(threadTask);
         boolean shopping = true;
         while (shopping) {
-            System.out.println("Welcome to the shop! What would you like to do? Buy or Sell(B/S)");
+            System.out.println("\rWelcome to the shop! What would you like to do? Buy or Sell(B/S)");
             Scanner scanner = new Scanner(System.in);
-            char lecture = scanner.next().charAt(0);
-            if (lecture == 'B' || lecture == 'b') {
-                System.out.println("Selecting buying menu:\nNadia(animals)\nMark(crops)\nIrene(other)\nPress 1,2 or 3");
-                Scanner scannerBuy = new Scanner(System.in);
-                char lecture2 = scannerBuy.next().charAt(0);
+            char lecture = scanner.next().toLowerCase().charAt(0);
+            if (lecture == 'b') {
+                System.out.println("\rSelecting buying menu:\nNadia(animals)\nMark(crops)\nIrene(other)\nPress 1,2 or 3");
+                int lecture2 = scanner.nextInt();
+                switch (lecture2) {
+                    case 1:
+                        System.out.println("Nadia's shop: Cow-150$(1), Chicken-40$(2), Sheep-135$(3)");
+                        int lecture3 = scanner.nextInt();
+                        switch (lecture3) {
+                            case 1:
+                                buyCow(money, date, inventory);
+                                break;
+                            case 2:
+                                buyChicken(money, date, inventory);
+                                break;
+                            case 3:
+                                buySheep(money, date, inventory);
+                                break;
+                            default:
+                                shop(money, date, threadTask, inventory);
+                        }
+                        break;
+                    case 2:
+                        int lecture4 = scanner.nextInt();
+                        switch (lecture4) {
+                            case 1:
+                                buyCow(money, date, inventory);
+                                break;
+                            case 2:
+                                buyChicken(money, date, inventory);
+                                break;
+                            case 3:
+                                buySheep(money, date, inventory);
+                                break;
+                            default:
+                                shop(money, date, threadTask, inventory);
+                        }
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        shop(money, date, threadTask, inventory);
+                }
 
-            } else if ((lecture == 'S' || lecture == 's')) {
-                System.out.println("Selecting selling menu:\nNadia(animals)\nMark(crops)\nIrene(other)\nPress 1,2 or 3");
-                Scanner scannerSell = new Scanner(System.in);
-                char lecture3 = scannerSell.next().charAt(0);
+            } else if ((lecture == 's')) {
+                System.out.println("\rSelecting selling menu:\nNadia(animals)\nMark(crops)\nIrene(other)\nPress 1,2 or 3");
+                int lecture2 = scanner.nextInt();
 
             } else {
                 System.out.println("Invalid input.");
             }
-            System.out.println("Do you want to continue shopping? Y/N");
-            Scanner continueScanner = new Scanner(System.in);
-            char continueChoice = continueScanner.next().charAt(0);
-            if (continueChoice == 'N' || continueChoice == 'n') {
+            System.out.println("\rDo you want to continue shopping? Y/N");
+            char continueChoice = scanner.next().toLowerCase().charAt(0);
+            if (continueChoice == 'n') {
                 shopping = false;
             }
         }
     }
+
     public boolean quit(UpdateMenuThreadTask threadTask) throws Exception {
+        if (threadTask.isActiveInScreen())
+            switchThread(threadTask);
+
         boolean quitting = true;
         while (quitting) {
-            threadTask.stopProcess();
-            System.out.println("Are you sure you want to leave?Y/N");
+
+            System.out.println("\rAre you sure you want to leave?Y/N");
             Scanner scanner = new Scanner(System.in);
-            char lecture = scanner.next().charAt(0);
-            if (lecture == 'Y' || lecture == 'y') {
-                System.exit(0);
-                throw new Exception("Process ended. Game closed");
-            } else if (lecture == 'N' || lecture == 'n') {
-                quitting = false;
-                System.out.println("N has been processed");
-                threadTask.startProcess();
+            char lecture = scanner.next().toLowerCase().charAt(0);
+            if (lecture == 'y') {
+                threadTask.stop();
+                throw new Exception("Game closed.");
+            } else if (lecture == 'n') {
+                return true;
             } else {
                 System.out.println("Invalid input.");
             }
         }
-        System.out.println("back to main");
         //No leave main loop
-        return true;
+        return false;
     }
-    public void switchThread(UpdateMenuThreadTask threadTask){
-        if(threadTask.isActiveInScreen()==false) {
-            threadTask.setActiveInScreen(true);
+
+    public void switchThread(UpdateMenuThreadTask threadTask) {
+        threadTask.setActiveInScreen(!threadTask.isActiveInScreen());
+    }
+
+    public void buyCow(float money, Calendar date, List inventory) {
+        float costCow = 150.00f;
+        if (money >= costCow) {
+            money = money - costCow;
+            System.out.println("\rYou just bought a cow!What name will you give her?");
+
+            Scanner scanner = new Scanner(System.in);
+            String lecture = scanner.next();
+            Calendar birthdate = (Calendar) date.clone();
+            birthdate.add(Calendar.DAY_OF_MONTH, -30);
+            //ADD COW. NOT IMPLEMENTED YET
+
+
+        } else {
+            System.out.println("\rYou don't have enough money, Shop closed.");
         }
-        else {
-            threadTask.setActiveInScreen(false);
+    }
+
+    public void buyChicken(float money, Calendar date, List inventory) {
+        float costCow = 150.00f;
+        if (money >= costCow) {
+            money = money - costCow;
+            System.out.println("\rYou just bought a cow!What name will you give her?");
+
+            Scanner scanner = new Scanner(System.in);
+            String lecture = scanner.next();
+            Calendar birthdate = (Calendar) date.clone();
+            birthdate.add(Calendar.DAY_OF_MONTH, -30);
+            //ADD CHICKEN. NOT IMPLEMENTED YET.
+
+        } else {
+            System.out.println("\rYou don't have enough money, Shop closed.");
+        }
+    }
+
+    public void buySheep(float money, Calendar date, List inventory) {
+        float costCow = 150.00f;
+        if (money >= costCow) {
+            money = money - costCow;
+            System.out.println("\rYou just bought a cow!What name will you give her?");
+
+            Scanner scanner = new Scanner(System.in);
+            String lecture = scanner.next();
+            Calendar birthdate = (Calendar) date.clone();
+            birthdate.add(Calendar.DAY_OF_MONTH, -30);
+            //ADD SHEEP. NOT IMPLEMENTED YET
+
+
+        } else {
+            System.out.println("\rYou don't have enough money, Shop closed.");
         }
     }
 }

@@ -3,51 +3,43 @@ package stardewvalley;
 import java.io.*;
 import java.util.Scanner;
 
-public class ResourceAccess{
+public class ResourceAccess {
 
 
     //Once used it's not necessary.
     public void callIn() throws Exception {
-        StardewValleyLogin localStardewValley= new StardewValleyLogin("archivoUsuarios.txt");
-        String fileName="archivoUsuarios.txt";
-        File file=new File(fileName);
-        if(file.exists()){
-            System.out.println("Desea crear usuario(escriba 1) o lista de usuarios(escriba 2) o eliminar usuario(escriba 3) o login usuario(escriba 4)");
-            Scanner login_register= new Scanner(System.in);
-            String newContact=login_register.next();
-            if (!newContact.equals("1")&&!newContact.equals("2")&&!newContact.equals("3")&&!newContact.equals("4")) {
-                throw new IllegalArgumentException("Wrong input parameter");
-
-            }else {
-
-                if(newContact.equals("1")){
+        StardewValleyLogin localStardewValley = new StardewValleyLogin("archivoUsuarios.txt");
+        String fileName = "archivoUsuarios.txt";
+        File file = new File(fileName);
+        if (file.exists()) {
+            System.out.println("Would you like to create user(1), check the users list(2),delete user(3) or login user(4)");
+            Scanner scanner = new Scanner(System.in);
+            int newContact = scanner.nextInt();
+            switch (newContact) {
+                case 1:
                     //add user
                     localStardewValley.add();
-                }
-                else if (newContact.equals("2")) {
+                case 2:
                     // list of users
                     localStardewValley.list();
-                }
-                else if (newContact.equals("3")){
+                case 3:
                     //remove user
-                    System.out.println("Qué usuario desea eliminar de la lista: ");
+                    System.out.println("What username would you like to delete: ");
                     localStardewValley.list();
-                    Scanner deleteuserinput= new Scanner(System.in);
-                    String user=deleteuserinput.next();
+
+                    String user = scanner.next();
                     localStardewValley.remove(user);
-                }
-                else {
+                case 4:
+                    localStardewValley.list();
                     //login
-                    Scanner deleteuserinput= new Scanner(System.in);
-                    String user=deleteuserinput.next();
-                    localStardewValley.login(user);
-                }
+
+                    String userlog = scanner.next();
+                    localStardewValley.login(userlog);
+                default:
+                    throw new IllegalArgumentException("Wrong input parameter.");
             }
-        }
-        else{
+        } else {
             localStardewValley.create();
         }
-
-
     }
 }

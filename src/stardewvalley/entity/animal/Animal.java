@@ -1,16 +1,38 @@
 package stardewvalley.entity.animal;
 
-public abstract class Animal{
-    public String name;
-    protected int age;
-    public Animal(String name,int age){
-        this.name=name;
-        this.age=age;
+import java.util.Calendar;
+
+public class Animal {
+    private String name;
+    private Calendar birthdate;
+    private Calendar date;
+
+    public Animal(String name, Calendar date) {
+        this.name = name;
+        this.date = date;
     }
-    public void birthday(){
-        this.age++;
+
+    public String getName() {
+        return name;
     }
-    public void returnFood(){
-        System.out.println("The animal gave you Food");
+
+    public Calendar getBirthdate() {
+        return birthdate;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setBirthdate(Calendar date) {
+        this.birthdate = backDate(date);
+    }
+
+    public Calendar backDate(Calendar date) {
+        //              REDO
+        //              vvv
+        Calendar backD = date;
+        return backD;
+    }
+
 }
