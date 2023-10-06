@@ -1,16 +1,21 @@
 package stardewvalley;
 
 import stardewvalley.entity.animal.Animal;
+import stardewvalley.entity.animal.Cow;
+import stardewvalley.entity.item.Bucket;
+import stardewvalley.entity.item.Item;
 import stardewvalley.thread.UpdateMenuThreadTask;
+import stardewvalley.user.farmLand.FarmLand;
 import stardewvalley.user.inventory.Inventory;
+import stardewvalley.user.inventory.Money;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Scanner;
 
 public class UserGame {
-    public Calendar date;
 
     public static Calendar initialCalendarGame() {
         Calendar date = Calendar.getInstance();
@@ -23,34 +28,32 @@ public class UserGame {
     }
 
     public String username;
-    public float money;
+
 
     public UserGame(String username) {
         this.username = username;
-        this.money = money;
+
     }
 
     public String getUsername() {
         return username;
     }
 
-    public float getMoney() {
-        return money;
-    }
 
-    public void setMoney(float moneyPay) {
-        this.money += moneyPay;
-    }
+
+
 
 
     public void mainGame() throws Exception {
 
         //SETTING UP YOUR CHARACTER
         Inventory userInventory = new Inventory();
-        List<Animal> farmLand = new ArrayList<>();
+        //  Bucket bucket = new Bucket("bucket");
+        // userInventory.addItem(bucket); CHECKED, inventory works.
 
+        FarmLand farmLand = new FarmLand();
+        Money money=new Money(2000);//Initial money
 
-        setMoney(2000);//Initial money
         boolean reading = true;
 
         //STARTING TIME RUN
@@ -74,20 +77,26 @@ public class UserGame {
                     System.out.println("\rback to mainGame");
                     break;
                 case 'o'://options
-                    System.out.println("\rOptions are: t for toggle time display, q for quit the game,b for open the merch");
+                    System.out.println("\rOptions are: t for toggle time display, q for quit the game,b for open the shop, m for check your money,i to open your inventory, f see your farm land");
                     break;
                 case 's'://shop
-                    shop(money, date, threadTask, (List) userInventory);
+                    shop(money, date, threadTask, userInventory, farmLand);
                     break;
                 case 'm':
                     System.out.println("Your money" + money);
+                    break;
+                case 'i': //Open your inventory
+                    userInventory.listItems();
+                    break;
+                case 'f': //Open your inventory
+                    farmLand.listAnimals();
                     break;
             }
         }
         System.out.println("value of reading your input " + reading + ", therefore we are not suposed to be there, this is a non contemplated place");
     }
 
-    public void shop(float money, Calendar date, UpdateMenuThreadTask threadTask, List inventory) {
+    public void shop(Money money, Calendar date, UpdateMenuThreadTask threadTask, Inventory inventory, FarmLand farmLand) {
         if (threadTask.isActiveInScreen()) switchThread(threadTask);
         boolean shopping = true;
         while (shopping) {
@@ -103,7 +112,7 @@ public class UserGame {
                         int lecture3 = scanner.nextInt();
                         switch (lecture3) {
                             case 1:
-                                buyCow(money, date, inventory);
+                                buyCow(money, date, inventory, farmLand);
                                 break;
                             case 2:
                                 buyChicken(money, date, inventory);
@@ -112,29 +121,30 @@ public class UserGame {
                                 buySheep(money, date, inventory);
                                 break;
                             default:
-                                shop(money, date, threadTask, inventory);
+                                shop(money, date, threadTask, inventory, farmLand);
                         }
                         break;
                     case 2:
+                        break;
+                    case 3:
+                        System.out.println("Irene's shop: Bucket-10$(1), future implementation");
                         int lecture4 = scanner.nextInt();
                         switch (lecture4) {
                             case 1:
-                                buyCow(money, date, inventory);
+                                buyBucket(money, inventory);
                                 break;
                             case 2:
-                                buyChicken(money, date, inventory);
+
                                 break;
                             case 3:
-                                buySheep(money, date, inventory);
+
                                 break;
                             default:
-                                shop(money, date, threadTask, inventory);
+                                shop(money, date, threadTask, inventory, farmLand);
                         }
                         break;
-                    case 3:
-                        break;
                     default:
-                        shop(money, date, threadTask, inventory);
+                        shop(money, date, threadTask, inventory, farmLand);
                 }
 
             } else if ((lecture == 's')) {
@@ -179,56 +189,75 @@ public class UserGame {
         threadTask.setActiveInScreen(!threadTask.isActiveInScreen());
     }
 
-    public void buyCow(float money, Calendar date, List inventory) {
+    public void buyCow(Money money, Calendar date, Inventory userInventory, FarmLand farmLand) {
         float costCow = 150.00f;
-        if (money >= costCow) {
-            money = money - costCow;
-            System.out.println("\rYou just bought a cow!What name will you give her?");
+        buyAnimal(money, date, userInventory, farmLand, Cow.class, costCow);
+    }
 
+
+    public void buyChicken(Money money, Calendar date, Inventory inventory) {
+        float costCow = 150.00f;
+
+    }
+
+    public void buySheep(Money money, Calendar date, Inventory inventory) {
+        float costCow = 150.00f;
+
+
+    }
+
+    /**
+     * Here is an example for reading items inside a List
+     * List<Animal> animals = farmLand.getAnimals();
+     * for (Animal animal : animals) {
+     * String name = animal.getName();
+     * System.out.println("Name: " + name);
+     * }
+     **/
+    public void buyAnimal(Money money, Calendar date, Inventory userInventory, FarmLand farmLand, Class<? extends Animal> animalClass, float cost) {
+        if (money.getAmount() >= cost) {
+            money.subtract(cost);
+            System.out.println("You just bought an animal! What name will you give it?");
             Scanner scanner = new Scanner(System.in);
-            String lecture = scanner.next();
+            String name = scanner.next();
             Calendar birthdate = (Calendar) date.clone();
             birthdate.add(Calendar.DAY_OF_MONTH, -30);
-            //ADD COW. NOT IMPLEMENTED YET
 
-
+            try {
+                Constructor<? extends Animal> constructor = animalClass.getConstructor(String.class, Calendar.class);//we use constructor to get a way that allow us to create the animal with String and Calendar
+                Animal newAnimal = constructor.newInstance(name, birthdate);
+                farmLand.addAnimal(newAnimal);
+                System.out.println("Added " + animalClass.getSimpleName() + " named " + name + " to your farm.");
+            } catch (Exception e) {
+                System.out.println("Error adding animal: " + e.getMessage());
+            }
         } else {
-            System.out.println("\rYou don't have enough money, Shop closed.");
+            System.out.println("You don't have enough money, Shop closed.");
         }
     }
 
-    public void buyChicken(float money, Calendar date, List inventory) {
-        float costCow = 150.00f;
-        if (money >= costCow) {
-            money = money - costCow;
-            System.out.println("\rYou just bought a cow!What name will you give her?");
+    public void buyBucket(Money money, Inventory userInventory) {
+        float costBucket = 20.00f;
+        buyItem(money, userInventory, Bucket.class, costBucket);
 
-            Scanner scanner = new Scanner(System.in);
-            String lecture = scanner.next();
-            Calendar birthdate = (Calendar) date.clone();
-            birthdate.add(Calendar.DAY_OF_MONTH, -30);
-            //ADD CHICKEN. NOT IMPLEMENTED YET.
 
-        } else {
-            System.out.println("\rYou don't have enough money, Shop closed.");
-        }
     }
 
-    public void buySheep(float money, Calendar date, List inventory) {
-        float costCow = 150.00f;
-        if (money >= costCow) {
-            money = money - costCow;
-            System.out.println("\rYou just bought a cow!What name will you give her?");
-
-            Scanner scanner = new Scanner(System.in);
-            String lecture = scanner.next();
-            Calendar birthdate = (Calendar) date.clone();
-            birthdate.add(Calendar.DAY_OF_MONTH, -30);
-            //ADD SHEEP. NOT IMPLEMENTED YET
+    public void buyItem(Money money, Inventory userInventory, Class<? extends Item> itemClass, float costItem) {
+        if (money.getAmount() >= costItem) {
+            money.subtract(costItem);
+            System.out.println("You just bought an " + itemClass.getName() + "!");
 
 
+            try {
+                Constructor<? extends Item> constructor = itemClass.getConstructor(String.class);
+                Item newItem = constructor.newInstance(itemClass.getName());
+                userInventory.addItem(newItem);
+            } catch (Exception e) {
+                System.out.println("Error buying item: " + e.getMessage());
+            }
         } else {
-            System.out.println("\rYou don't have enough money, Shop closed.");
+            System.out.println("You don't have enough money, Shop closed.");
         }
     }
 }

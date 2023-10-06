@@ -2,22 +2,22 @@ package stardewvalley.entity.animal;
 
 import java.util.Calendar;
 
-public class Animal {
+public abstract class Animal {
     private String name;
     private Calendar birthdate;
-    private Calendar date;
 
-    public Animal(String name, Calendar date) {
+    public Animal(String name, Calendar birthdate) {
         this.name = name;
-        this.date = date;
+        this.birthdate = birthdate;
+
     }
 
     public String getName() {
         return name;
     }
 
-    public Calendar getBirthdate() {
-        return birthdate;
+    public String getBirthdate() {
+        return String.valueOf("Year: " + this.birthdate.get(Calendar.YEAR) + "Month: " + this.birthdate.get(Calendar.MONTH) + " Day:" + this.birthdate.get(Calendar.DAY_OF_MONTH));
     }
 
     public void setName(String name) {

@@ -3,15 +3,16 @@ package stardewvalley.entity.item;
 public class Item {
     private String name;
     private String description;
-    private int quantity; // Agrega un campo para almacenar la cantidad
+    private int quantity; // Store value
 
-    public Item(String name, String description) {
+
+    public Item(String name) {
         this.name = name;
-        this.description = description;
-        this.quantity = 0; // Inicializa la cantidad en 0 al crear un nuevo objeto Item
+        this.description = "item description";
+        this.quantity = 0; // Initialize item starting at 0;
     }
 
-    // Getters y setters para name, description y quantity
+    // Getters y setters for name, description y quantity
 
     public String getName() {
         return name;
@@ -35,5 +36,19 @@ public class Item {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public void increaseQuantity(int amount) {
+        quantity += amount;
+    }
+
+    public void decreaseQuantity(int amount) {
+        if (quantity == 0) {
+            quantity = 0;
+        } else if (quantity >= amount) {
+            quantity -= amount;
+        } else {
+            quantity = 0;
+        }
     }
 }

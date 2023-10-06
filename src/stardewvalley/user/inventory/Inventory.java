@@ -13,7 +13,12 @@ public class Inventory {
     }
 
     public void addItem(Item item) {
-        items.add(item);
+        if (!items.contains(item)) {
+            items.add(item);
+            item.setQuantity(1);
+        } else {
+            item.increaseQuantity(1);
+        }
     }
 
     public void removeItem(Item item) {
@@ -31,10 +36,10 @@ public class Inventory {
                 if (item.getClass().equals(itemToRemove.getClass())) {
                     int currentQuantity = item.getQuantity();
                     if (currentQuantity > 1) {
-                        // Si hay más de 1, reduce la cantidad en 1
+                        // Reduce by one the item
                         item.setQuantity(currentQuantity - 1);
                     } else {
-                        // Si solo hay 1, elimina el item del inventario
+                        // If only one, remove the whole item
                         items.remove(item);
                     }
                     return; // Termina el método después de realizar la operación
@@ -43,6 +48,13 @@ public class Inventory {
         } else {
             //Did not find item
             System.out.println("Could not find Item.");
+        }
+    }
+
+    public void listItems() {
+        System.out.println("List of items:");
+        for (Item item : items) {
+            System.out.println("Item: " + item + ", amount: " + item.getQuantity());
         }
     }
 
